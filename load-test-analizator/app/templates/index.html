@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Load Test Dashboard</title>
+<link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+<h1>Load Test Dashboard</h1>
+<section style="margin-bottom: 20px;">
+  <h2>Upload CSV File</h2>
+  <form id="upload-form" enctype="multipart/form-data">
+    <input type="file" id="csv-file" name="file" accept=".csv" required />
+    <button type="submit">Upload</button>
+  </form>
+  <p id="upload-status"></p>
+</section>
+<div>
+    <label for="service-select">Select Service:</label>
+    <select id="service-select"></select>
+</div>
+<div id="stability-summary"></div>
+<div id="resource-charts">
+    <canvas id="cpuChart"></canvas>
+    <canvas id="memoryChart"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>
