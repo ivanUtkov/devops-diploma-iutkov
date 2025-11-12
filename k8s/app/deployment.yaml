@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-test-analizator
+  namespace: app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: load-test-analizator
+  template:
+    metadata:
+      labels:
+        app: load-test-analizator
+    spec:
+      containers:
+      - name: app
+        image: cr.yandex/<REGISTRY_ID>/load-test-analizator:latest
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - secretRef:
+            name: s3-credentials
+        readinessProbe:
+          httpGet: { path: /, port: 8000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet: { path: /, port: 8000 }
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"

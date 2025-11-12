@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: load-test-analizator
+  namespace: app
+spec:
+  selector:
+    app: load-test-analizator
+  ports:
+  - port: 80
+    targetPort: 8000
+    protocol: TCP
