@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: load-test-analizator
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    env_file:
+      - ./app/.env

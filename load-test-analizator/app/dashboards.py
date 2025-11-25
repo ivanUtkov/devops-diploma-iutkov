@@ -2,6 +2,7 @@ from typing import Optional
 from .crud import DATA_STORAGE
 from .schemas import StabilityResponse, StabilityMetrics, ResourceUsageResponse, ResourceUsageEntry
 
+
 def analyze_stability(service_name: Optional[str]) -> StabilityResponse:
     filtered = [d for d in DATA_STORAGE if (service_name is None or d["service_name"] == service_name)]
     total_requests = sum(d["request_count"] for d in filtered)
@@ -17,6 +18,7 @@ def analyze_stability(service_name: Optional[str]) -> StabilityResponse:
             avg_response_time_95=avg_response_time
         )
     )
+
 
 def resource_usage(service_name: Optional[str]) -> ResourceUsageResponse:
     filtered = [d for d in DATA_STORAGE if (service_name is None or d["service_name"] == service_name)]

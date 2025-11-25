@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Виртуальное окружение
+venv/
+.venv/
+
+# IDE и системные файлы
+.vscode/
+.idea/
+.DS_Store
+
+# Локальные env-файлы
+.env
+*.env
+
+# Логи
+*.log

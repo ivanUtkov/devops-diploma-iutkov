@@ -13,6 +13,7 @@ s3 = boto3.client(
     aws_secret_access_key=AWS_SECRET_ACCESS_KEY
 )
 
+
 def upload_report():
     # For demo, upload a simple text report with stability analysis summary
     report_content = "This is a sample load test report."
