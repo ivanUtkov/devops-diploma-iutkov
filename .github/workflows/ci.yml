@@ -33,3 +33,8 @@ jobs:
         run: |
           cd load-test-analizator
           pytest
+
+      - name: Build Docker image
+        run: |
+          cd load-test-analizator
+          docker build -t load-test-analizator:test-ci .
