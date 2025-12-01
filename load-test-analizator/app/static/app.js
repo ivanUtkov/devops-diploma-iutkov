@@ -94,7 +94,7 @@ document.getElementById("upload-form").addEventListener("submit", async (event) 
     formData.append("file", file);
 
     try {
-        const response = await fetch("http://localhost:8000/upload-csv/", {
+        const response = await fetch(`${API_BASE}/upload-csv/`, {
             method: "POST",
             body: formData,
         });
