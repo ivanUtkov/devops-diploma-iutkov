@@ -33,3 +33,6 @@ sa-key.json
 # --- ANSIBLE ---
 *.retry
 *.vault
+
+# Ansible local inventory
+infra/ansible/inventory.ini
