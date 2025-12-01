@@ -18,3 +18,18 @@ venv/
 
 # Логи
 *.log
+
+# --- TERRAFORM ---
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
+.terraform/
+.terraform.lock.hcl
+
+# Private keys
+sa-key.json
+
+# --- ANSIBLE ---
+*.retry
+*.vault
