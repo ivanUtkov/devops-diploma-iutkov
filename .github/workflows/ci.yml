@@ -47,7 +47,7 @@ jobs:
 
       - name: Build and push Docker image to GHCR
         env:
-          IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/load-test-analizator
+          IMAGE_NAME: ghcr.io/ivanutkov/load-test-analizator
         run: |
           cd load-test-analizator
           docker build -t $IMAGE_NAME:latest .
