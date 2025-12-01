@@ -1,0 +1,41 @@
+---
+- name: Deploy load-test-analizator app container
+  hosts: app
+  become: yes
+
+  tasks:
+    - name: Ensure application directory exists
+      file:
+        path: /opt/diploma-app
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Render docker-compose.yml
+      template:
+        src: templates/docker-compose.yml.j2
+        dest: /opt/diploma-app/docker-compose.yml
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Create .env file if not exists
+      template:
+        src: templates/app.env.j2
+        dest: /opt/diploma-app/.env
+        owner: ubuntu
+        group: ubuntu
+        mode: "0600"
+        force: no
+
+    - name: Pull latest app image from GHCR
+      command: docker compose pull
+      args:
+        chdir: /opt/diploma-app
+
+    - name: Start app container
+      command: docker compose up -d
+      args:
+        chdir: /opt/diploma-app
+
