@@ -12,6 +12,16 @@
         group: ubuntu
         mode: "0755"
 
+    - name: Ensure Grafana data directory exists with proper permissions
+      file:
+        path: /opt/diploma-app/grafana
+        state: directory
+        owner: "472"
+        group: "472"
+        mode: "0755"
+        recurse: yes
+
+
     - name: Render docker-compose.yml
       template:
         src: templates/docker-compose.yml.j2
