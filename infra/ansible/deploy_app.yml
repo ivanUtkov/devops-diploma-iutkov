@@ -21,11 +21,26 @@
         mode: "0755"
         recurse: yes
 
+    - name: Ensure Prometheus config directory exists
+      file:
+        path: /opt/diploma-app/prometheus
+        state: directory
+        owner: "472"
+        group: "472"
+        mode: "0755"
 
     - name: Render docker-compose.yml
       template:
         src: templates/docker-compose.yml.j2
         dest: /opt/diploma-app/docker-compose.yml
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Render prometheus.yml
+      template:
+        src: templates/prometheus.yml.j2
+        dest: /opt/diploma-app/prometheus/prometheus.yml
         owner: ubuntu
         group: ubuntu
         mode: "0644"
