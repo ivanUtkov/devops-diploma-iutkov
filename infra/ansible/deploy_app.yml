@@ -4,6 +4,13 @@
   become: yes
 
   tasks:
+    - name: Ensure vm.max_map_count is set for Elasticsearch
+      sysctl:
+        name: vm.max_map_count
+        value: "262144"
+        state: present
+        reload: yes
+
     - name: Ensure application directory exists
       file:
         path: /opt/diploma-app
@@ -55,12 +62,12 @@
         force: no
 
     - name: Pull latest app image from GHCR
-      command: docker compose pull
+      command: docker compose pull app
       args:
         chdir: /opt/diploma-app
 
     - name: Start app container
-      command: docker compose up -d
+      command: docker compose up -d app grafana prometheus node_exporter
       args:
         chdir: /opt/diploma-app
 
