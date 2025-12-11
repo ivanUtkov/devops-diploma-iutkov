@@ -60,6 +60,22 @@ services:
       - 'OPENSEARCH_HOSTS=["http://elasticsearch:9200"]'
       - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
 
+  diploma-filebeat:
+    container_name: diploma-filebeat
+    image: docker.elastic.co/beats/filebeat-oss:7.10.2
+    user: root
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/diploma-app/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - diploma-filebeat-data:/usr/share/filebeat/data
+    environment:
+      - ELASTICSEARCH_HOST=elasticsearch
+      - ELASTICSEARCH_PORT=9200
+    depends_on:
+      - elasticsearch
+
 volumes:
   elasticsearch-data:
   opensearch-data:
+  diploma-filebeat-data:
