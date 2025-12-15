@@ -2,8 +2,27 @@
 - name: Deploy load-test-analizator app container
   hosts: app
   become: yes
+  gather_facts: no
   vars:
     app_dir: /opt/diploma-app
+
+  pre_tasks:
+    - name: Free space - remove old Ansible tmp dirs
+      ansible.builtin.raw: rm -rf /home/ubuntu/.ansible/tmp /tmp/.ansible || true
+      changed_when: false
+
+    - name: Free space - truncate Docker container logs
+      ansible.builtin.raw: |
+        bash -lc 'find /var/lib/docker/containers -name "*-json.log" -type f -print0 | xargs -0 --no-run-if-empty truncate -s 0'
+      changed_when: false
+
+    - name: Free space - prune unused Docker data
+      ansible.builtin.raw: docker system prune -af --volumes
+      changed_when: false
+
+    - name: Free space - clean apt cache
+      ansible.builtin.raw: apt-get clean
+      changed_when: false
 
   tasks:
     - name: Ensure vm.max_map_count is set for Elasticsearch / OpenSearch
@@ -53,6 +72,7 @@
         owner: ubuntu
         group: ubuntu
         mode: "0644"
+      notify: Restart logging stack
 
     - name: Render prometheus.yml
       template:
@@ -75,9 +95,10 @@
       template:
         src: templates/filebeat.yml.j2
         dest: "{{ app_dir }}/filebeat/filebeat.yml"
-        owner: ubuntu
-        group: ubuntu
-        mode: '0644'
+        owner: root
+        group: root
+        mode: '0600'
+      notify: Restart logging stack
 
     - name: Pull latest app image from GHCR
       command: docker compose pull app
@@ -95,13 +116,21 @@
       changed_when:
         - compose_up.rc == 0
 
+    - name: Force restart logging stack every run
+      command: /bin/true
+      notify: Restart logging stack
+      changed_when: true
+
+    - name: Apply logging stack changes before availability checks
+      meta: flush_handlers
+
     - name: Wait for OpenSearch (Elasticsearch container) to be available
       ansible.builtin.uri:
         url: "http://localhost:9200"
         method: GET
         status_code: 200
       register: opensearch_status
-      retries: 30
+      retries: 3
       delay: 5
       until: opensearch_status.status == 200
 
@@ -116,3 +145,29 @@
         body_format: json
         status_code: 200
 
+    - name: Test Filebeat output to OpenSearch
+      command: docker exec diploma-filebeat filebeat test output -e
+      args:
+        chdir: "{{ app_dir }}"
+      register: filebeat_output_test
+      changed_when: false
+      failed_when: filebeat_output_test.rc != 0
+
+    - name: Wait for Filebeat index to appear
+      ansible.builtin.uri:
+        url: "http://localhost:9200/_cat/indices/filebeat-*?format=json"
+        method: GET
+        status_code: [200, 404]
+      register: filebeat_indices
+      retries: 12
+      delay: 5
+      until: filebeat_indices.status == 200 and (filebeat_indices.json | default([]) | length) > 0
+
+  handlers:
+    - name: Restart logging stack
+      command: docker compose up -d --force-recreate elasticsearch diploma-filebeat
+      args:
+        chdir: "{{ app_dir }}"
+      register: logging_stack_restart
+      changed_when:
+        - logging_stack_restart.rc == 0
